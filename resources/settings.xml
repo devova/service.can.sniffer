@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="COM Port">
+        <setting label="Device" type="text" id="com_port" default="/dev/ttyUSB0"/>
+        <setting label="Speed" type="number" id="com_speed" default="460800"/>
+    </category>
+</settings>
