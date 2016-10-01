@@ -2,7 +2,7 @@ import xbmc, xbmcgui
 import os
 import xml.etree.ElementTree as ET
 
-from lib.utils import get_current_window_id
+from lib.core import get_current_window_id
 
 
 def _get_skin_resolution():

@@ -1,11 +1,17 @@
-import xbmc
+import xbmc, xbmcgui
+import json
+
 from decoder.net import WebSocketDecoder
-from lib.volume_overlay import VolumeOverlay
-from lib.utils import get_current_window_id
+from decoder.media import RD45Decoder
+from decoder.bsi import BSIDecoder
+
+from lib.overlays.volume import VolumeOverlay
+from lib.overlays.rpm import RPMOverlay
+from lib.core import get_current_window_id, throttle, run_async
 
 DECODERS = [
+    'decoder.bsi.BSIDecoder',
     'decoder.media.RD45Decoder',
-    'decoder.bsi.BSIDecoder'
 ]
 
 
@@ -13,15 +19,24 @@ class NavigationDecoder(WebSocketDecoder):
 
     def __init__(self):
         super(NavigationDecoder, self).__init__(DECODERS, proxy_attributes=True)
+        # self.rd45 = RD45Decoder()
+        # self.bsi = BSIDecoder()
+
         self.monitor = xbmc.Monitor()
         self.on('0x3e5', self.openMenu)
         self.on('0x165', self.changeRadioStatus)
         self.on('0x1a5', self.changeVolume)
 
+        self.on('0x0b6', self.change_rpm)
+
+        self.prev_window_id = 0
         self._source = None
         self._orign_volume = None
-        self._volume_overlay = VolumeOverlay(0)
-        self.prev_window_id = 0
+        self._volume_overlay = VolumeOverlay()
+
+        self._rpm_overlay = RPMOverlay()
+        self._rpm_overlay.show()
+        self._rpm_overlay.rpm = 0
 
     @property
     def terminate(self):
@@ -46,13 +61,21 @@ class NavigationDecoder(WebSocketDecoder):
 
         self._source = self.source
 
+    @throttle(1)
     def changeVolume(self, *args):
 
         if self._orign_volume and self._orign_volume != self.volume:
-            # xbmcgui.Dialog().notification('VOLUME %s' % self.volume, '', xbmcgui.NOTIFICATION_INFO, 200)
+
             self._volume_overlay.show()
             self._volume_overlay.volume = self.volume
-            xbmc.sleep(2000)
+            xbmc.sleep(500)
             self._volume_overlay.hide()
-
         self._orign_volume = self.volume
+
+    @throttle(1)
+    def change_rpm(self, *args):
+
+        # xbmcgui.Dialog().notification(json.dumps(self.bsi.rpm), '',
+        #                               xbmcgui.NOTIFICATION_INFO, 200)
+        # if (abs(self.bsi.rpm - self._rpm_overlay.rpm) > 200):
+        self._rpm_overlay.rpm = self.bsi.rpm

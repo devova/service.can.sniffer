@@ -5,7 +5,7 @@ from lib.overlay import Overlay
 
 class VolumeOverlay(Overlay):
 
-    def __init__(self, volume):
+    def __init__(self):
         super(VolumeOverlay, self).__init__()
         self._volume = 0
         viewport_w, viewport_h = self.viewport_width, self.viewport_height
@@ -26,10 +26,8 @@ class VolumeOverlay(Overlay):
         self.add_control(self._title)
 
         self._progress = xbmcgui.ControlProgress(
-            x + 20, y + 80, window_w - 20, 20)
+            x + 20, y + 80, window_w - 20, 10)
         self.add_control(self._progress)
-
-        self.volume = volume
 
     @property
     def volume(self):
