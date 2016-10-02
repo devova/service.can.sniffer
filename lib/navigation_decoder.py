@@ -18,7 +18,8 @@ DECODERS = [
 class NavigationDecoder(WebSocketDecoder):
 
     def __init__(self):
-        super(NavigationDecoder, self).__init__(DECODERS, proxy_attributes=True)
+        super(NavigationDecoder, self).__init__(
+            DECODERS, proxy_attributes=True, parse_subscribed_only=True)
         # self.rd45 = RD45Decoder()
         # self.bsi = BSIDecoder()
 
